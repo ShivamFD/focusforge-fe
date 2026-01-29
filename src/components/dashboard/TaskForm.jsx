@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import toast from 'react-hot-toast';
-import { taskAPI } from '../services/api';
+import { taskAPI } from '../../services/api';
 
 const TaskForm = () => {
   const queryClient = useQueryClient();
