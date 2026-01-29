@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { ToastContainer } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
 // Pages
@@ -72,7 +72,7 @@ function App() {
               </div>
             } />
           </Routes>
-          <ToastContainer position="top-right" />
+          <Toaster position="top-right" />
         </div>
       </Router>
     </QueryClientProvider>
