@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
 import { authAPI } from '../services/api';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuthContext } from '../contexts/AuthContext.jsx';
 
 const RegisterPage = () => {
   const navigate = useNavigate();

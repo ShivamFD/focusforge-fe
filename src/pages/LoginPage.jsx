@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuthContext } from '../contexts/AuthContext.jsx';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ const LoginPage = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-900">
             Or{' '}
             <Link
               to="/register"

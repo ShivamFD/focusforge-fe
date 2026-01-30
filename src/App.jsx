@@ -5,7 +5,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
 // Contexts
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext.jsx';
 
 // Pages
 import LandingPage from './pages/LandingPage';

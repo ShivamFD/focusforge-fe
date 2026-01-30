@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from 'react-query';
 import toast from 'react-hot-toast';
 import { authAPI, taskAPI, streakAPI, reportAPI } from '../services/api';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuthContext } from '../contexts/AuthContext.jsx';
 import TaskForm from '../components/dashboard/TaskForm';
 import TaskList from '../components/dashboard/TaskList';
 import StreakCard from '../components/dashboard/StreakCard';
