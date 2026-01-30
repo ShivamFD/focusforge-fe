@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
 import { authAPI } from '../services/api';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuthContext(); // We'll use the login function to set the token after registration
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,25 +19,11 @@ const RegisterPage = () => {
     },
   });
 
-  const registerMutation = useMutation(
-    (userData) => authAPI.register(userData),
-    {
-      onSuccess: (response) => {
-        const { token, user } = response.data.data;
-        localStorage.setItem('token', token);
-        toast.success(`Welcome, ${user.name}! Your account has been created.`);
-        navigate('/dashboard');
-      },
-      onError: (error) => {
-        const message = error.response?.data?.message || 'Registration failed';
-        toast.error(message);
-      },
-    }
-  );
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     if (name.startsWith('publicProfile.')) {
       const profileField = name.split('.')[1];
       setFormData({
@@ -53,27 +41,43 @@ const RegisterPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
-    
-    // Prepare user data
-    const userData = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      publicProfile: {
-        alias: formData.publicProfile.alias || formData.name,
-        showOnLeaderboard: formData.publicProfile.showOnLeaderboard,
-      },
-    };
-    
-    registerMutation.mutate(userData);
+
+    setLoading(true);
+
+    try {
+      // Prepare user data
+      const userData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        publicProfile: {
+          alias: formData.publicProfile.alias || formData.name,
+          showOnLeaderboard: formData.publicProfile.showOnLeaderboard,
+        },
+      };
+
+      const response = await authAPI.register(userData);
+      const { token, user } = response.data.data;
+
+      // Manually set the token (similar to login)
+      localStorage.setItem('token', token);
+
+      toast.success(`Welcome, ${user.name}! Your account has been created.`);
+      navigate('/dashboard');
+    } catch (error) {
+      const message = error.response?.data?.message || 'Registration failed';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -111,7 +115,7 @@ const RegisterPage = () => {
                 placeholder="Full Name"
               />
             </div>
-            
+
             <div className="mt-4">
               <label htmlFor="email-address" className="sr-only">
                 Email address
@@ -128,7 +132,7 @@ const RegisterPage = () => {
                 placeholder="Email address"
               />
             </div>
-            
+
             <div className="mt-4">
               <label htmlFor="password" className="sr-only">
                 Password
@@ -145,7 +149,7 @@ const RegisterPage = () => {
                 placeholder="Password"
               />
             </div>
-            
+
             <div className="mt-4">
               <label htmlFor="confirmPassword" className="sr-only">
                 Confirm Password
@@ -166,7 +170,7 @@ const RegisterPage = () => {
 
           <div className="card p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Public Profile</h3>
-            
+
             <div className="mb-4">
               <label htmlFor="publicProfile.alias" className="block text-sm font-medium text-gray-700 mb-1">
                 Alias (for leaderboard)
@@ -184,7 +188,7 @@ const RegisterPage = () => {
                 This will be shown on public leaderboards instead of your name
               </p>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 id="publicProfile.showOnLeaderboard"
@@ -206,10 +210,10 @@ const RegisterPage = () => {
           <div>
             <button
               type="submit"
-              disabled={registerMutation.isLoading}
+              disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {registerMutation.isLoading ? (
+              {loading ? (
                 <span>Creating account...</span>
               ) : (
                 <span>Create account</span>
