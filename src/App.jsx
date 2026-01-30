@@ -4,6 +4,9 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
+// Contexts
+import { AuthProvider } from './contexts/AuthContext';
+
 // Pages
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -29,52 +32,54 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className="App">
-          <Routes>
-            <Route path="/" element={
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <LandingPage />
-              </motion.div>
-            } />
-            <Route path="/login" element={
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <LoginPage />
-              </motion.div>
-            } />
-            <Route path="/register" element={
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <RegisterPage />
-              </motion.div>
-            } />
-            <Route path="/dashboard/*" element={
-              <div className="min-h-screen bg-gray-50">
-                <Navbar />
+      <AuthProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              <Route path="/" element={
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <Dashboard />
+                  <LandingPage />
                 </motion.div>
-              </div>
-            } />
-          </Routes>
-          <Toaster position="top-right" />
-        </div>
-      </Router>
+              } />
+              <Route path="/login" element={
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <LoginPage />
+                </motion.div>
+              } />
+              <Route path="/register" element={
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <RegisterPage />
+                </motion.div>
+              } />
+              <Route path="/dashboard/*" element={
+                <div className="min-h-screen bg-gray-50">
+                  <Navbar />
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Dashboard />
+                  </motion.div>
+                </div>
+              } />
+            </Routes>
+            <Toaster position="top-right" />
+          </div>
+        </Router>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
