@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from 'react-query';
 import toast from 'react-hot-toast';
 import { authAPI, taskAPI, streakAPI, reportAPI } from '../services/api';
+import { useAuthContext } from '../contexts/AuthContext';
 import TaskForm from '../components/dashboard/TaskForm';
 import TaskList from '../components/dashboard/TaskList';
 import StreakCard from '../components/dashboard/StreakCard';
@@ -12,22 +13,14 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('tasks');
   const [selectedTask, setSelectedTask] = useState(null);
 
-  // Fetch user data
-  const { data: userData, isLoading: userLoading } = useQuery(
-    'user',
-    () => authAPI.getMe().then(res => res.data.data.user),
-    {
-      retry: false,
-      refetchOnWindowFocus: false,
-    }
-  );
+  const { user, isAuthenticated, isLoading: authLoading } = useAuthContext();
 
   // Fetch tasks
   const { data: tasksData, isLoading: tasksLoading } = useQuery(
     'tasks',
     () => taskAPI.getTasks({ isActive: true }).then(res => res.data.data.tasks),
     {
-      enabled: !!userData,
+      enabled: !!isAuthenticated,
     }
   );
 
@@ -36,7 +29,7 @@ const Dashboard = () => {
     'streaks',
     () => streakAPI.getUserStreaks().then(res => res.data.data.streaks),
     {
-      enabled: !!userData,
+      enabled: !!isAuthenticated,
     }
   );
 
@@ -45,7 +38,7 @@ const Dashboard = () => {
     'stats',
     () => reportAPI.getUserStats().then(res => res.data.data.stats),
     {
-      enabled: !!userData,
+      enabled: !!isAuthenticated,
     }
   );
 
@@ -54,7 +47,7 @@ const Dashboard = () => {
     'heatmap',
     () => reportAPI.getHeatmap().then(res => res.data.data.heatmapData),
     {
-      enabled: !!userData,
+      enabled: !!isAuthenticated,
     }
   );
 
@@ -102,7 +95,7 @@ const Dashboard = () => {
     recoverTaskMutation.mutate({ taskId });
   };
 
-  if (userLoading || tasksLoading) {
+  if (authLoading || tasksLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
@@ -117,7 +110,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
             <div className="text-sm text-gray-500">
-              Welcome back, {userData?.publicProfile?.alias || userData?.name}
+              Welcome back, {user?.publicProfile?.alias || user?.name}
             </div>
           </div>
         </div>
@@ -184,8 +177,8 @@ const Dashboard = () => {
         {activeTab === 'tasks' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <TaskList 
-                tasks={tasksData || []} 
+              <TaskList
+                tasks={tasksData || []}
                 onComplete={handleCompleteTask}
                 onRecover={handleRecoverTask}
                 isLoading={tasksLoading}
@@ -202,9 +195,9 @@ const Dashboard = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Your Streaks</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {(streaksData || []).map((streak) => (
-                <StreakCard 
-                  key={streak._id} 
-                  streak={streak} 
+                <StreakCard
+                  key={streak._id}
+                  streak={streak}
                   task={streak.taskId}
                 />
               ))}
