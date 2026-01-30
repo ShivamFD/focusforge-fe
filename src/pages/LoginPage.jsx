@@ -1,42 +1,43 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useMutation } from 'react-query';
-import { authAPI } from '../services/api';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
-  const loginMutation = useMutation(
-    (credentials) => authAPI.login(credentials),
-    {
-      onSuccess: (response) => {
-        const { token, user } = response.data.data;
-        localStorage.setItem('token', token);
-        toast.success(`Welcome back, ${user.name}!`);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const result = await login(formData);
+
+      if (result.success) {
+        toast.success(`Welcome back, ${result.user.name}!`);
         navigate('/dashboard');
-      },
-      onError: (error) => {
-        const message = error.response?.data?.message || 'Login failed';
-        toast.error(message);
-      },
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error('Login failed');
+    } finally {
+      setLoading(false);
     }
-  );
+  };
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    loginMutation.mutate(formData);
   };
 
   return (
@@ -122,10 +123,10 @@ const LoginPage = () => {
           <div>
             <button
               type="submit"
-              disabled={loginMutation.isLoading}
+              disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loginMutation.isLoading ? (
+              {loading ? (
                 <span>Loading...</span>
               ) : (
                 <span>Sign in</span>
