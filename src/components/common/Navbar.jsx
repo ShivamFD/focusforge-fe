@@ -1,26 +1,30 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useQuery } from 'react-query';
-import { authAPI } from '../../services/api';
+import { useAuthContext } from '../../contexts/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
-
-  // Check if user is authenticated
-  const { data: userData, isLoading, isError } = useQuery(
-    'user',
-    () => authAPI.getMe().then(res => res.data.data.user),
-    {
-      retry: false,
-      refetchOnWindowFocus: false,
-      enabled: !!localStorage.getItem('token'),
-    }
-  );
+  const { user, isAuthenticated, isLoading, logout } = useAuthContext();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    logout();
     navigate('/');
   };
+
+  if (isLoading) {
+    return (
+      <nav className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <Link to="/" className="flex-shrink-0 flex items-center">
+              <span className="text-xl font-bold text-blue-600">FocusForge</span>
+            </Link>
+            <div className="animate-pulse text-gray-500">Loading...</div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
@@ -37,7 +41,7 @@ const Navbar = () => {
               >
                 Home
               </Link>
-              {!userData && (
+              {!isAuthenticated && (
                 <>
                   <Link
                     to="/login"
@@ -53,7 +57,7 @@ const Navbar = () => {
                   </Link>
                 </>
               )}
-              {userData && (
+              {isAuthenticated && (
                 <Link
                   to="/dashboard"
                   className="text-gray-500 hover:text-gray-700 px-1 pt-1 font-medium"
@@ -64,10 +68,10 @@ const Navbar = () => {
             </div>
           </div>
           <div className="flex items-center">
-            {userData ? (
+            {isAuthenticated && user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-700 hidden md:block">
-                  Welcome, {userData.publicProfile.alias || userData.name}
+                  Welcome, {user.publicProfile?.alias || user.name}
                 </span>
                 <button
                   onClick={handleLogout}
