@@ -3,6 +3,7 @@ import { useQuery, useQueryClient, useMutation } from 'react-query';
 import toast from 'react-hot-toast';
 import { authAPI, taskAPI, streakAPI, reportAPI } from '../services/api';
 import { useAuthContext } from '../contexts/AuthContext.jsx';
+import { Navigate } from 'react-router-dom';
 import TaskForm from '../components/dashboard/TaskForm';
 import TaskList from '../components/dashboard/TaskList';
 import StreakCard from '../components/dashboard/StreakCard';
@@ -14,6 +15,23 @@ const Dashboard = () => {
   const [selectedTask, setSelectedTask] = useState(null);
 
   const { user, isAuthenticated, isLoading: authLoading } = useAuthContext();
+
+  // Redirect if not authenticated or if admin
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
 
   // Fetch tasks
   const { data: tasksData, isLoading: tasksLoading } = useQuery(
