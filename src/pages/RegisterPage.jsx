@@ -7,7 +7,7 @@ import { useAuthContext } from '../contexts/AuthContext.jsx';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuthContext(); // We'll use the login function to set the token after registration
+  const { login, isAuthenticated, user } = useAuthContext(); // We'll use the login function to set the token after registration
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,6 +20,13 @@ const RegisterPage = () => {
   });
 
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(user.role === 'admin' ? '/admin' : '/dashboard');
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -71,7 +78,7 @@ const RegisterPage = () => {
       localStorage.setItem('token', token);
 
       toast.success(`Welcome, ${user.name}! Your account has been created.`);
-      navigate('/dashboard');
+      navigate(user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed';
       toast.error(message);
