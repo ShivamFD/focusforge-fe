@@ -16,29 +16,12 @@ const Dashboard = () => {
 
   const { user, isAuthenticated, isLoading: authLoading } = useAuthContext();
 
-  // Redirect if not authenticated or if admin
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (user?.role === 'admin') {
-    return <Navigate to="/admin" replace />;
-  }
-
   // Fetch tasks
   const { data: tasksData, isLoading: tasksLoading } = useQuery(
     'tasks',
     () => taskAPI.getTasks({ isActive: true }).then(res => res.data.data.tasks),
     {
-      enabled: !!isAuthenticated,
+      enabled: !!isAuthenticated && user?.role !== 'admin',
     }
   );
 
@@ -47,7 +30,7 @@ const Dashboard = () => {
     'streaks',
     () => streakAPI.getUserStreaks().then(res => res.data.data.streaks),
     {
-      enabled: !!isAuthenticated,
+      enabled: !!isAuthenticated && user?.role !== 'admin',
     }
   );
 
@@ -56,7 +39,7 @@ const Dashboard = () => {
     'stats',
     () => reportAPI.getUserStats().then(res => res.data.data.stats),
     {
-      enabled: !!isAuthenticated,
+      enabled: !!isAuthenticated && user?.role !== 'admin',
     }
   );
 
@@ -65,7 +48,7 @@ const Dashboard = () => {
     'heatmap',
     () => reportAPI.getHeatmap().then(res => res.data.data.heatmapData),
     {
-      enabled: !!isAuthenticated,
+      enabled: !!isAuthenticated && user?.role !== 'admin',
     }
   );
 
@@ -104,6 +87,23 @@ const Dashboard = () => {
       },
     }
   );
+
+  // Redirect if not authenticated or if admin
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
 
   const handleCompleteTask = (taskId) => {
     completeTaskMutation.mutate({ taskId });
