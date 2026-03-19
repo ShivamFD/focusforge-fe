@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { leaderboardAPI } from '../services/api';
+import Navbar from '../components/common/Navbar';
 
 const LandingPage = () => {
   const { data: leaderboardData, isLoading: leaderboardLoading } = useQuery(
@@ -15,6 +16,8 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Navbar showHomeLink={false} />
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
