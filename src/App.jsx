@@ -12,6 +12,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 // Components
 import Navbar from './components/common/Navbar';
@@ -65,13 +66,25 @@ function App() {
               } />
               <Route path="/dashboard/*" element={
                 <div className="min-h-screen bg-gray-50">
-                  <Navbar />
+                  <Navbar showHomeLink={true} />
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
                   >
                     <Dashboard />
+                  </motion.div>
+                </div>
+              } />
+              <Route path="/admin/*" element={
+                <div className="min-h-screen bg-gray-50">
+                  <Navbar showHomeLink={true} />
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <AdminDashboard />
                   </motion.div>
                 </div>
               } />
