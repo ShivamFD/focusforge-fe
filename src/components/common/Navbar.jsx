@@ -2,9 +2,10 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext.jsx';
 
-const Navbar = () => {
+const Navbar = ({ showHomeLink = false }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated, isLoading, logout } = useAuthContext();
+  const isAdmin = user?.role === 'admin';
 
   const handleLogout = () => {
     logout();
@@ -35,12 +36,14 @@ const Navbar = () => {
               <span className="text-xl font-bold text-blue-600">FocusForge</span>
             </Link>
             <div className="hidden md:ml-6 md:flex md:space-x-8">
-              <Link
-                to="/"
-                className="text-gray-500 hover:text-gray-700 px-1 pt-1 font-medium"
-              >
-                Home
-              </Link>
+              {showHomeLink && (
+                <Link
+                  to="/"
+                  className="text-gray-500 hover:text-gray-700 px-1 pt-1 font-medium"
+                >
+                  Home
+                </Link>
+              )}
               {!isAuthenticated && (
                 <>
                   <Link
@@ -57,12 +60,20 @@ const Navbar = () => {
                   </Link>
                 </>
               )}
-              {isAuthenticated && (
+              {isAuthenticated && !isAdmin && (
                 <Link
                   to="/dashboard"
                   className="text-gray-500 hover:text-gray-700 px-1 pt-1 font-medium"
                 >
                   Dashboard
+                </Link>
+              )}
+              {isAuthenticated && isAdmin && (
+                <Link
+                  to="/admin"
+                  className="text-gray-500 hover:text-gray-700 px-1 pt-1 font-medium"
+                >
+                  Admin Panel
                 </Link>
               )}
             </div>
@@ -71,7 +82,8 @@ const Navbar = () => {
             {isAuthenticated && user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-700 hidden md:block">
-                  Welcome, {user.publicProfile?.alias || user.name}
+                  {user.publicProfile?.alias || user.name}
+                  {isAdmin && <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded">Admin</span>}
                 </span>
                 <button
                   onClick={handleLogout}
