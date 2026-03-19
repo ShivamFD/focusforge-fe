@@ -80,4 +80,13 @@ export const leaderboardAPI = {
   getUserPosition: () => api.get('/leaderboard/my-position'),
 };
 
+// Admin API
+export const adminAPI = {
+  getAllUsers: () => api.get('/admin/users'),
+  getUserById: (userId) => api.get(`/admin/users/${userId}`),
+  updateUserRole: (userId, role) => api.put(`/admin/users/${userId}/role`, { role }),
+  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
+  getSystemStats: () => api.get('/admin/stats'),
+};
+
 export default api;
