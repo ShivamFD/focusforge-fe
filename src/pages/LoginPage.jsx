@@ -5,13 +5,20 @@ import { useAuthContext } from '../contexts/AuthContext.jsx';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuthContext();
+  const { login, isAuthenticated, user } = useAuthContext();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(user.role === 'admin' ? '/admin' : '/dashboard');
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +29,7 @@ const LoginPage = () => {
 
       if (result.success) {
         toast.success(`Welcome back, ${result.user.name}!`);
-        navigate('/dashboard');
+        navigate(result.user.role === 'admin' ? '/admin' : '/dashboard');
       } else {
         toast.error(result.error);
       }
